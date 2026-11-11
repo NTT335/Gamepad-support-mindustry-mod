@@ -16,9 +16,34 @@ dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 }
 
+task dex(type: JavaExec) {
+    dependsOn classes
+    classpath = files("r8.jar")
+    mainClass = "com.android.tools.r8.D8"
+
+    def dexDir = file("$buildDir/dex")
+    outputs.dir(dexDir)
+
+    doFirst {
+        dexDir.mkdirs()
+    }
+
+    doFirst {
+        def classFiles = fileTree(dir: "$buildDir/classes/java/main", include: "**/*.class").files.collect { it.absolutePath }
+        args = [
+            "--min-api", "21",
+            "--output", dexDir.absolutePath,
+            "--lib", "libs/core-v154.jar",
+            "--lib", "libs/arc-core-v154.jar"
+        ] + classFiles
+    }
+}
+
 jar {
+    dependsOn dex
     from "mod.json"
     from "icon.png"
+    from "$buildDir/dex"
 
     archiveFileName = "GamepadSupport.jar"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
