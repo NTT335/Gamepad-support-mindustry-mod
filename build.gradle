@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+version '1.4.0'
+group 'gamepad'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+sourceSets.main.java.srcDirs = ["src"]
+
+dependencies {
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+jar {
+    from "mod.json"
+    from "icon.png"
+
+    archiveFileName = "GamepadSupport.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 17
+    options.compilerArgs += ["-Xlint:none"]
+}
